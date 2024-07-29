@@ -15,6 +15,8 @@ import os
 from dotenv import load_dotenv
 
 
+# OpenAI APIキー
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # .env ファイルをロード
 load_dotenv()
@@ -55,6 +57,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'translation',
 ]
 
 MIDDLEWARE = [
