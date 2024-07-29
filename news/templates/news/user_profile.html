@@ -1,0 +1,17 @@
+<!-- templates/news/user_profile.html -->
+
+{% extends "base.html" %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+<h2 class="my-4">Bookmarked Articles</h2>
+
+<ul class="list-group">
+    {% for bookmark in bookmarks %}
+    <li class="list-group-item">
+        <a href="{% url 'article_detail' bookmark.article.pk %}">{{ bookmark.article.title }}</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

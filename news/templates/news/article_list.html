@@ -1,0 +1,33 @@
+<!-- news/templates/news/article_list.html -->
+
+{% extends "base.html" %}
+
+{% block title %}AI News Articles{% endblock %}
+
+{% block content %}
+<h2 class="my-4">AI News Articles</h2>
+
+<form method="get" action="{% url 'article_list' %}" class="form-inline mb-4">
+    <input type="text" name="query" class="form-control mr-2" placeholder="Search" value="{{ request.GET.query }}">
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<ul class="list-group">
+    {% for article in page_obj %}
+    <li class="list-group-item">
+        <a href="{% url 'article_detail' article.pk %}">{{ article.title }}</a>
+        <p>{{ article.publication_date }}</p>
+    </li>
+    {% endfor %}
+</ul>
+
+<div class="mt-4">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">&laquo; Previous</a>
+    {% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Next &raquo;</a>
+    {% endif %}
+</div>
+{% endblock %}

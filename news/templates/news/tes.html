@@ -1,0 +1,123 @@
+<!-- templates/news/article_detail.html -->
+
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+<div class="my-4">
+    <h2 class="text-2xl font-bold">
+        <a href="{{ article.link }}" target="_blank" class="text-dark">{{ article.title }}</a>
+    </h2>
+    <p class="text-muted">{{ article.publication_date }}</p>
+    <p>{{ article.content }}</p>
+    <button id="bookmark-btn" class="btn btn-outline-primary my-2">Bookmark</button>
+</div>
+
+<a href="{% url 'article_list' %}" class="btn btn-secondary mb-4">Back to Articles List</a>
+
+<h3 class="my-4">Comments</h3>
+<ul id="comments-list" class="list-group">
+    <!-- コメントはJavaScriptで追加されます -->
+</ul>
+
+{% if user.is_authenticated %}
+    <form id="comment-form" class="my-4">
+        {% csrf_token %}
+        <div class="form-group">
+            <textarea id="comment-content" name="content" class="form-control" rows="4" placeholder="Add a comment"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Comment</button>
+    </form>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const articleId = {{ article.id }};
+    const commentsList = document.getElementById('comments-list');
+
+    // コメントを取得して表示
+    fetch(`/api/comments/?article=${articleId}`)
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(comment => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.textContent = `${comment.user}: ${comment.content}`;
+
+                if (comment.is_owner || {{ user.is_superuser|yesno:"true,false" }}) {
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'btn btn-danger btn-sm ml-2';
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.onclick = function() {
+                        fetch(`/api/comments/${comment.id}/`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                            }
+                        }).then(response => {
+                            if (response.ok) {
+                                li.remove();
+                            } else {
+                                alert('Failed to delete comment');
+                            }
+                        });
+                    };
+                    li.appendChild(deleteButton);
+
+                    const editButton = document.createElement('button');
+                    editButton.className = 'btn btn-secondary btn-sm ml-2';
+                    editButton.textContent = 'Edit';
+                    editButton.onclick = function() {
+                        const newContent = prompt('Edit your comment:', comment.content);
+                        if (newContent) {
+                            fetch(`/api/comments/${comment.id}/`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                                },
+                                body: JSON.stringify({ content: newContent })
+                            }).then(response => response.json())
+                              .then(updatedComment => {
+                                  li.textContent = `${updatedComment.user}: ${updatedComment.content}`;
+                                  li.appendChild(deleteButton);
+                                  li.appendChild(editButton);
+                              });
+                        }
+                    };
+                    li.appendChild(editButton);
+                }
+
+                commentsList.appendChild(li);
+            });
+        });
+
+    // コメントを追加
+    const commentForm = document.getElementById('comment-form');
+    if (commentForm) {
+        commentForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const content = document.getElementById('comment-content').value;
+
+            fetch(`/api/comments/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: JSON.stringify({ content, article: articleId })
+            })
+            .then(response => response.json())
+            .then(comment => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.textContent = `${comment.user}: ${comment.content}`;
+                commentsList.appendChild(li);
+                document.getElementById('comment-content').value = '';
+            });
+        });
+    }
+
+    // ブックマークボタンの動作
+    const bookmarkBtn = document.get

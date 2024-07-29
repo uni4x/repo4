@@ -1,0 +1,17 @@
+<!-- templates/account/signup.html -->
+
+{% extends "base.html" %}
+
+{% load socialaccount %}  <!-- これを追加 -->
+
+{% block content %}
+<h2>Sign Up</h2>
+<form method="post" action="{% url 'account_signup' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Sign Up</button>
+</form>
+
+<!-- Googleログインのリンク -->
+<a href="{% provider_login_url 'google' %}">Sign Up with Google</a>
+{% endblock %}
