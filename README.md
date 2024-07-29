@@ -1,121 +1,117 @@
+# AIニュース集約アプリ
 
-# AI News Aggregator
+## 概要
+AIニュース集約アプリは、Djangoを使用して構築されたWebアプリケーションで、さまざまなソースからAI関連のニュース記事をスクレイピングし、ユーザーフレンドリーなインターフェースで表示します。ユーザーは特定の記事を検索し、各記事の詳細情報を表示することができます。
 
-## Overview
-AI News Aggregator is a web application built with Django that scrapes AI-related news articles from various sources and displays them on a user-friendly interface. Users can search for specific articles and view detailed information about each article.
+## 機能
+- VentureBeat、ScienceDaily、AI NewsからAIニュース記事をスクレイピング
+- タイトル、概要、公開日を表示
+- キーワードで記事を検索する機能
+- 記事の詳細情報と元のソースへのリンクを表示
+- 記事のページネーション（ページ分割）機能
+- ユーザー認証（登録およびログイン）
+- 記事をブックマークし、ユーザープロフィールページに表示
+- 記事へのコメント機能（編集および削除も可能）
+- Googleソーシャルログイン統合
 
-## Features
-- Scrapes AI news articles from VentureBeat
-- Displays articles with titles, summaries, and publication dates
-- Search functionality to find articles by keywords
-- Detailed view for each article with a link to the original source
-- Pagination for easy navigation through articles
+## インストール
 
-## Installation
-
-### Prerequisites
-- Python 3.6+
-- Django 3.0+
+### 必要条件
+- Python 3.6以上
+- Django 3.0以上
 - Django REST Framework
 
-### Setup
-1. Clone the repository
+### セットアップ
+1. リポジトリをクローンする
     ```bash
     git clone https://github.com/yourusername/ai-news-aggregator.git
     cd ai-news-aggregator
     ```
 
-2. Create and activate a virtual environment
+2. 仮想環境を作成してアクティブにする
     ```bash
     python -m venv venv
-    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+    source venv/bin/activate  # Windowsの場合は `venv\Scripts\activate`
     ```
 
-3. Install the dependencies
+3. 依存関係をインストールする
     ```bash
     pip install -r requirements.txt
     ```
 
-4. Set up the database
+4. データベースをセットアップする
     ```bash
     python manage.py migrate
     ```
 
-5. Create a superuser for accessing the admin site
+5. 管理サイトにアクセスするためのスーパーユーザーを作成する
     ```bash
     python manage.py createsuperuser
     ```
 
-6. Run the development server
+6. ソーシャル認証を設定する：
+   - Google Developer Consoleにアクセスし、新しいプロジェクトを作成し、OAuth 2.0のクレデンシャル（クライアントIDとクライアントシークレット）を取得します。
+   - これらのクレデンシャルを`settings.py`ファイルに追加します。
+    ```python
+    SOCIALACCOUNT_PROVIDERS = {
+        'google': {
+            'SCOPE': [
+                'profile',
+                'email',
+            ],
+            'AUTH_PARAMS': {
+                'access_type': 'online',
+            },
+            'OAUTH_PKCE_ENABLED': True,
+            'APP': {
+                'client_id': 'YOUR_CLIENT_ID',
+                'secret': 'YOUR_CLIENT_SECRET',
+                'key': ''
+            }
+        }
+    }
+    ```
+
+7. 開発サーバーを起動する
     ```bash
     python manage.py runserver
     ```
 
-7. Access the application at `http://127.0.0.1:8000/`
+8. アプリケーションにアクセスする `http://127.0.0.1:8000/`
 
-## Usage
+## 使用方法
 
-### Scraping News Articles
-To scrape AI news articles from VentureBeat, run the following command:
+### ニュース記事のスクレイピング
+複数のソースからAIニュース記事をスクレイピングするには、次のコマンドを実行します：
     ```bash
-    python manage.py scrape_venturebeat
+    python manage.py scrape_all_news
     ```
-Accessing Articles
-Navigate to http://127.0.0.1:8000/news/articles/ to view the list of articles.
-Use the search bar to find articles by keywords.
-Click on an article title to view the detailed information and visit the original source.
-Project Structure
-    ```
-    .
-    ├── db.sqlite3
-    ├── manage.py
-    ├── news
-    │   ├── __init__.py
-    │   ├── admin.py
-    │   ├── apps.py
-    │   ├── forms.py
-    │   ├── management
-    │   │   └── commands
-    │   │       └── scrape_venturebeat.py
-    │   ├── migrations
-    │   ├── models.py
-    │   ├── scripts
-    │   │   └── scrape_VentureBeatAI_news.py
-    │   ├── serializers.py
-    │   ├── templates
-    │   │   └── news
-    │   │       └── article_list.html
-    │   │       └── article_detail.html
-    │   ├── tests.py
-    │   ├── urls.py
-    │   └── views.py
-    ├── news_aggregator
-    │   ├── __init__.py
-    │   ├── asgi.py
-    │   ├── settings.py
-    │   ├── urls.py
-    │   └── wsgi.py
-    └── templates
-        └── rest_framework
-            └── api.html
-    ```
-    
-Contributing
 
-Contributions are welcome! Please fork this repository and submit a pull request for any features, enhancements, or bug fixes.
+### 記事のアクセス
+- 記事一覧を見るには、`http://127.0.0.1:8000/news/articles/`に移動します。
+- 検索バーを使用してキーワードで記事を検索できます。
+- 記事のタイトルをクリックして、詳細情報と元のソースにアクセスできます。
 
-License
+### ユーザー機能
+- 登録、ログイン、アカウント管理ができます。
+- 記事をブックマークし、プロフィールページで表示できます。
+- 記事にコメントを追加し、編集、削除できます。
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+### 管理サイト
+- 管理サイトにアクセスするには、`http://127.0.0.1:8000/admin/`に移動し、記事、コメント、ユーザーを管理します。
 
-Contact
+## コントリビューション
 
-For any inquiries or feedback, please contact your-email@example.com.
+コントリビューションは大歓迎です！このリポジトリをフォークし、新機能、拡張機能、バグ修正のためにプルリクエストを送信してください。
 
+## ライセンス
 
+このプロジェクトはMITライセンスの下でライセンスされています。詳細についてはLICENSEファイルを参照してください。
+
+## お問い合わせ
+
+ご質問やフィードバックがありましたら、your-email@example.comまでご連絡ください。
 
 ### 追加情報
 
-- これはポートフォリオです
-
-
+- これはポートフォリオです。
