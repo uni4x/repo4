@@ -1,6 +1,7 @@
 # news/views.py
 
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.core.paginator import Paginator
@@ -10,7 +11,14 @@ from rest_framework.decorators import action
 from .models import Article, Comment, Bookmark
 from .serializers import ArticleSerializer, CommentSerializer, BookmarkSerializer
 from .forms import CommentForm, ArticleSearchForm, MyCustomSignupForm
+import openai
+import json
+from django.conf import settings
 
+
+# OpenAIのAPIキーを設定
+openai.api_key = 'YOUR_OPENAI_API_KEY'
+openai.api_key = settings.OPENAI_API_KEY
 
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
@@ -85,6 +93,24 @@ def custom_logout_view(request):
     logout(request)
     return redirect('/')
 
+
+def translate_text(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        text_to_translate = data.get('text_to_translate', '')
+
+        if text_to_translate:
+            response = openai.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a translation assistant."},
+                    {"role": "user", "content": f"Translate the following text to Japanese: {text_to_translate}"}
+                ]
+            )
+            translation = response.choices[0].message.content.strip()
+            return JsonResponse({'translation': translation})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 class BookmarkViewSet(viewsets.ModelViewSet):
     queryset = Bookmark.objects.all()
