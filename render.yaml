@@ -1,7 +1,15 @@
 services:
   - type: web
-    name: my-django-app
+    name: repo4-django-app
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn repo4.wsgi"
-    runtime: python3.8
+    startCommand: "gunicorn news_aggregator.wsgi"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mydatabase
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: "4"
