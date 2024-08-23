@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-# import dj_database_url
+import dj_database_url
 
 
 # OpenAI APIキー
@@ -94,6 +94,7 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = "news_aggregator.wsgi.application"
 
 
@@ -101,10 +102,15 @@ WSGI_APPLICATION = "news_aggregator.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    # "dev": {
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "db.sqlite3",
+    # }
+
+    # Render
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+
 }
 
 

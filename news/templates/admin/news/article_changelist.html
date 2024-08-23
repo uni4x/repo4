@@ -1,0 +1,11 @@
+
+{# templates/admin/news/article_changelist.html #}
+
+{% extends "admin/change_list.html" %}
+
+{% block object-tools %}
+    <div class="object-tools" style="position: relative;">
+        <a href="scrape-news/" class="button" style="position: absolute; right: 150px; top: 0;">スクレイピングを実行</a>
+    </div>
+    {{ block.super }}
+{% endblock %}

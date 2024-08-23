@@ -3,7 +3,9 @@ services:
     name: repo4-django-app
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn news_aggregator.wsgi"
+    startCommand: |
+      python manage.py migrate
+      gunicorn news_aggregator.wsgi
     envVars:
       - key: DATABASE_URL
         fromDatabase:
